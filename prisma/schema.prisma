@@ -1,0 +1,68 @@
+// npx prisma push
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mongodb"
+  url      = env("DATABASE_URL")
+}
+
+model Post {
+  id       String @id @default(auto()) @map("_id") @db.ObjectId
+  slug     String @unique
+  title    String
+  body     String
+  author   User   @relation(fields: [authorId], references: [id])
+  authorId String @db.ObjectId
+}
+
+model User {
+  id       String  @id @default(auto()) @map("_id") @db.ObjectId
+  email    String  @unique
+  name     String?
+  password String
+  avatar   String?
+  posts    Post[]
+}
+
+model Animal {
+  id                 String    @id @default(auto()) @map("_id") @db.ObjectId
+  name               String
+  type               String?
+  breed              String
+  tagNumber          Int?
+  registrationNumber Int?
+  birthDate          DateTime?
+  purchaseDate       DateTime?
+  cost               Int?
+  neutered           Boolean?
+  neuteredDate       DateTime?
+  deathDate          DateTime?
+  cull               Boolean?
+  sold               Boolean?
+  soldTo             String?
+  salePrice          Int?
+  saleDate           DateTime?
+  auctionSale        Boolean?
+  auctionName        String?
+  auctionWeight      Int?
+  sire               String?
+  dam                String?
+  damSire            String?
+  breeder            String?
+  notes              String?
+  birthWeight        Int?
+  Herd               Herd?     @relation(fields: [herdId], references: [id])
+  herdId             String?   @db.ObjectId
+  ownerId            String    @db.ObjectId
+  photoUrl           String?
+}
+
+model Herd {
+  id      String   @id @default(auto()) @map("_id") @db.ObjectId
+  name    String
+  animals Animal[]
+  ownerId String   @db.ObjectId
+}
