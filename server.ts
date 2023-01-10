@@ -1,4 +1,4 @@
-import { Prisma, PrismaClient, User } from '@prisma/client';
+import { PrismaClient, User } from '@prisma/client';
 import express from 'express';
 import bcrypt from 'bcrypt';
 import cors from 'cors';
@@ -83,28 +83,18 @@ app.get('/user/profile', async (req, res) => {
     .then(async (user) => {
       if (!user) res.send().status(400);
       const { id, name, email } = user!;
-      res.send({ user: { id, name, email } });
+      res.send({ id, name, email } );
     });
 });
 
 app.get('/user/animals', async (req, res) => {
-  await prisma.animal
+  const userAnimals = await prisma.animal
     .findMany({
       where: {
         ownerId: req.query.userId as string,
       },
     })
-    .then(async (userAnimals) => {
-      const userName = await prisma.user.findFirst({
-        where: {
-          id: userAnimals[0].ownerId,
-        },
-        select: {
-          email: true,
-        },
-      });
-      res.send({ userAnimals, userName });
-    });
+    res.send(userAnimals);
 });
 
 /**

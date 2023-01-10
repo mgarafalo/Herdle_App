@@ -1,7 +1,7 @@
 export interface Animal {
   id?: string;
   type?: string;
-  name?: string;
+  name: string;
   breed?: string;
   tagNumber?: number;
   registrationnumber?: number;

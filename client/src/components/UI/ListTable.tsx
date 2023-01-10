@@ -12,20 +12,22 @@ import {
 import { Animal, Herd } from '../../Interfaces/Animal';
 import { animalPropertyProperNames } from '../../Interfaces/Constants';
 import EditIcon from '@mui/icons-material/Edit';
-import { Link } from 'react-router-dom';
 import { useState } from 'react';
 
 interface ListTableProps {
   data: Animal[] | Herd[];
   isOwner: boolean;
+  owner: string
 }
 
-export default function ListTable({ data, isOwner = false }: ListTableProps) {
+export default function ListTable({ data, isOwner = false, owner }: ListTableProps) {
   const [showEditModal, setShowEditModal] = useState<boolean>(false);
 
   function handleShowModal() {
     setShowEditModal(!showEditModal);
   }
+
+  console.log(isOwner)
 
   return (
     <>
@@ -55,14 +57,14 @@ export default function ListTable({ data, isOwner = false }: ListTableProps) {
             </TableRow>
           </TableHead>
           <TableBody>
-            {data.map((animal: Animal, i) => (
-              <TableRow key={i}>
+            {data.map((animal: Animal, index) => (
+              <TableRow key={index}>
                 <TableCell>
                   <Box className='flex flex-wrap flex-row items-center gap-3'>
                     <Avatar
                       src={animal.photoUrl ? animal.photoUrl : animal.name![0]}
                     ></Avatar>
-                    {isOwner && <EditIcon onClick={handleShowModal} />}
+                    {isOwner && <EditIcon key={index} onClick={handleShowModal} />}
                   </Box>
                 </TableCell>
                 {Object.entries(animal).map((value, i2) => (
@@ -70,9 +72,18 @@ export default function ListTable({ data, isOwner = false }: ListTableProps) {
                     {Object.keys(animalPropertyProperNames).includes(
                       value[0]
                     ) && (
+                      <>
+                      {value[0] === 'ownerId' ? (
                       <TableCell key={i2}>
+                        {owner}
+                      </TableCell>
+                      ): (
+
+                        <TableCell key={i2}>
                         {value[1] ? value[1] : 'N/A'}
                       </TableCell>
+                        )}
+                      </>
                     )}
                   </>
                 ))}
