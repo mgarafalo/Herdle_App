@@ -1,3 +1,5 @@
+import { Animal, Post } from "@prisma/client";
+
 export interface User {
   id?: string;
   username?: string;
@@ -5,4 +7,8 @@ export interface User {
   email: string;
   avatar?: string;
   token?: string;
+  herdle: Animal[];
+  followers?: string[];
+  following?: string[];
+  posts?: Post[];
 }

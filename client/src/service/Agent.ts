@@ -1,14 +1,15 @@
-import axios, { AxiosHeaders, AxiosResponse } from 'axios';
-import { User } from '../Interfaces/Account';
-import { Animal, Herd } from '../Interfaces/Animal';
-import { appStore } from '../store/store';
+import { Post } from "@prisma/client";
+import axios, { AxiosHeaders, AxiosResponse } from "axios";
+import { User } from "../Interfaces/Account";
+import { Animal, Herd } from "../Interfaces/Animal";
+import { appStore } from "../store/store";
 
-axios.defaults.baseURL = 'http://localhost:8080';
+axios.defaults.baseURL = "http://localhost:8080";
 
 axios.interceptors.request.use((config) => {
   const token = appStore.getState().appState.user.token;
   if (!token) {
-    const jwt = JSON.parse(window.localStorage.getItem('Herdle/Auth')!);
+    const jwt = JSON.parse(window.localStorage.getItem("Herdle/Auth")!);
     if (jwt) {
       config.headers = {
         Bearer: jwt.token,
@@ -31,10 +32,12 @@ const requests = {
 };
 
 const Account = {
-  login: (user: User) => requests.post<User>('/login', user),
-  signUp: (user: User) => requests.post<User>('/user/new', user),
+  login: (user: User) => requests.post<User>("/login", user),
+  signUp: (user: User) => requests.post<User>("/herdle/new", user),
   getUserInfo: (userId: string) =>
-    requests.get<User>(`/user/profile?userId=${userId}`),
+    requests.get<User>(`/herdle/profile?userId=${userId}`),
+  followUserAction: (userId: string, userInQuestion: string) =>
+    requests.post<User>("/herdle/followAction", { userId, userInQuestion }),
 };
 
 const Herd = {
@@ -51,16 +54,22 @@ const Herd = {
 
 const Animal = {
   getUsersAnimals: (userId: string) =>
-    requests.get<Animal[]>(`/user/animals?userId=${userId}`),
+    requests.get<Animal[]>(`/herdle/animals?userId=${userId}`),
   newAnimal: (animal: Animal, userId: string) =>
     requests.post<Animal>(`/animal/add?userId=${userId}`, animal),
   deleteAnimal: (animalId: string) =>
     requests.post<void>(`/animal/delete`, { animalId }),
 };
 
+const Posts = {
+  newPost: (userId: string, post: string) =>
+    requests.post<Post>(`/posts/new`, { userId, post }),
+};
+
 const agent = {
   Account,
   Herd,
   Animal,
+  Posts,
 };
 export default agent;

@@ -1,8 +1,8 @@
-import { PrismaClient, User } from '@prisma/client';
-import express from 'express';
-import bcrypt from 'bcrypt';
-import cors from 'cors';
-import jwt from 'jsonwebtoken';
+import { PrismaClient, User } from "@prisma/client";
+import express from "express";
+import bcrypt from "bcrypt";
+import cors from "cors";
+import jwt from "jsonwebtoken";
 
 const PORT = 8080;
 const app = express();
@@ -11,9 +11,37 @@ const prisma = new PrismaClient();
 app.use(cors());
 app.use(express.json());
 
-app.get('/getAllUsers', async (req, res) => {
+/**
+ * User Routes
+ */
+
+app.post("/login", async (req, res) => {
+  const { email, password } = req.body;
+  await prisma.user
+    .findFirst({ where: { email: email } })
+    .then(async (user: User | null) => {
+      if (user === null) {
+        res.send("No user found.");
+      }
+      await bcrypt
+        .compare(password, user?.password!)
+        .then((pwMatch: boolean) => {
+          if (pwMatch) {
+            const token = jwt.sign(
+              { id: user?.id, email: user?.email },
+              "secret"
+            );
+            res
+              .header("x-auth-token", token)
+              .send({ id: user?.id, email: user?.email, token });
+          }
+        });
+    });
+});
+
+app.get("/getAllUsers", async (req, res) => {
   await prisma.$connect().catch((error) => {
-    console.log('error', error);
+    console.log("error", error);
   });
 
   const allUsers = await prisma.user.findMany();
@@ -23,35 +51,7 @@ app.get('/getAllUsers', async (req, res) => {
   res.send(allUsers);
 });
 
-/**
- * User Routes
- */
-
-app.post('/login', async (req, res) => {
-  const { email, password } = req.body;
-  await prisma.user
-    .findFirst({ where: { email: email } })
-    .then(async (user: User | null) => {
-      if (user === null) {
-        res.send('No user found.');
-      }
-      await bcrypt
-        .compare(password, user?.password!)
-        .then((pwMatch: boolean) => {
-          if (pwMatch) {
-            const token = jwt.sign(
-              { id: user?.id, email: user?.email },
-              'secret'
-            );
-            res
-              .header('x-auth-token', token)
-              .send({ id: user?.id, email: user?.email, token });
-          }
-        });
-    });
-});
-
-app.post('/user/new', async (req, res) => {
+app.post("/herdle/new", async (req, res) => {
   await bcrypt.hash(req.body.password, 10).then(async (hashedPw) => {
     await prisma.user
       .findFirst({
@@ -61,7 +61,7 @@ app.post('/user/new', async (req, res) => {
       })
       .then(async (results: User | null) => {
         if (results) {
-          res.send('Email already taken');
+          res.send("Email already taken");
         }
         await prisma.user.create({
           data: {
@@ -77,32 +77,89 @@ app.post('/user/new', async (req, res) => {
   });
 });
 
-app.get('/user/profile', async (req, res) => {
+app.get("/herdle/profile", async (req, res) => {
   await prisma.user
-    .findFirst({ where: { id: req.query.id as string } })
+    .findFirst({
+      where: { id: req.query.id as string },
+      include: { herdle: true, posts: true },
+    })
     .then(async (user) => {
       if (!user) res.send().status(400);
-      const { id, name, email } = user!;
-      res.send({ id, name, email } );
+      const { id, name, email, herdle, posts, followedByIDs, followingIDs } =
+        user!;
+      res.send({
+        id,
+        name,
+        email,
+        herdle,
+        posts,
+        followers: followedByIDs,
+        following: followingIDs,
+      });
     });
 });
 
-app.get('/user/animals', async (req, res) => {
-  const userAnimals = await prisma.animal
-    .findMany({
+app.post("/herdle/followAction", async (req, res) => {
+  await prisma.user
+    .findFirst({
       where: {
-        ownerId: req.query.userId as string,
+        id: req.body.userInQuestion,
       },
     })
-    res.send(userAnimals);
+    .then(async (user) => {
+      if (
+        user?.followedByIDs.filter(
+          (followerId) => followerId === req.body.userId
+        ).length
+      ) {
+        await prisma.user
+          .update({
+            where: {
+              id: req.body.userInQuestion,
+            },
+            data: {
+              followedByIDs: user.followedByIDs.filter(
+                (followerId) => followerId !== req.body.userId
+              ),
+            },
+          })
+          .then((newUser) => {
+            res.send(newUser);
+          });
+      } else {
+        await prisma.user
+          .update({
+            where: {
+              id: req.body.userInQuestion,
+            },
+            data: {
+              followedByIDs: {
+                push: req.body.userId,
+              },
+            },
+          })
+          .then((newUser) => {
+            res.send(newUser);
+          });
+      }
+    });
+});
+
+app.get("/herdle/animals", async (req, res) => {
+  const userAnimals = await prisma.animal.findMany({
+    where: {
+      ownerId: req.query.userId as string,
+    },
+  });
+  res.send(userAnimals);
 });
 
 /**
  * Herd Routes
  */
 
-app.post('/herd/new', async (req, res) => {
-  const user = jwt.decode(req.headers['bearer'] as string) as User;
+app.post("/herd/new", async (req, res) => {
+  const user = jwt.decode(req.headers["bearer"] as string) as User;
   await prisma.herd
     .create({
       data: {
@@ -112,18 +169,18 @@ app.post('/herd/new', async (req, res) => {
       },
     })
     .then(() => {
-      res.send('worked').status(200);
+      res.send("worked").status(200);
     })
     .catch((error) => {
       res.send(error);
     });
 });
 
-app.get('/herd/single', async (req, res) => {
+app.get("/herd/single", async (req, res) => {
   await prisma.herd
     .findFirst({
       where: {
-        id: req.query['herdId'] as string,
+        id: req.query["herdId"] as string,
       },
     })
     .then((herd) => {
@@ -131,22 +188,25 @@ app.get('/herd/single', async (req, res) => {
     });
 });
 
-app.get('/all_herds', async (req, res) => {
-  await prisma.herd
+app.get("/all_herds", async (req, res) => {
+  await prisma.user
     .findMany({
       where: {
-        ownerId: req.query['userId'] as string,
+        id: req.query.id as string,
+      },
+      include: {
+        herdle: true,
       },
     })
-    .then((userHerds) => {
-      res.json(userHerds);
+    .then((user) => {
+      res.json(user[0].herdle);
     })
     .catch((error) => {
       res.send(error);
     });
 });
 
-app.post('/herd/add_animal', async (req, res) => {
+app.post("/herd/add_animal", async (req, res) => {
   await prisma.animal
     .update({
       where: {
@@ -169,14 +229,14 @@ app.post('/herd/add_animal', async (req, res) => {
     });
 });
 
-app.post('/herd/remove_animal', async (req, res) => {
+app.post("/herd/remove_animal", async (req, res) => {
   await prisma.animal
     .update({
       where: {
         id: req.body.animalId,
       },
       data: {
-        herdId: '',
+        herdId: "",
       },
     })
     .then(async () => {
@@ -196,7 +256,7 @@ app.post('/herd/remove_animal', async (req, res) => {
  * Animal Routes
  */
 
-app.get('/animal/single', async (req, res) => {
+app.get("/animal/single", async (req, res) => {
   await prisma.animal
     .findFirst({
       where: {
@@ -208,12 +268,12 @@ app.get('/animal/single', async (req, res) => {
     });
 });
 
-app.post('/animal/add', async (req, res) => {
+app.post("/animal/add", async (req, res) => {
   await prisma.animal
     .create({
       data: {
         ...req.body,
-        ownerId: req.query['userId'],
+        ownerId: req.query["userId"],
       },
     })
     .then((animal) => {
@@ -225,7 +285,7 @@ app.post('/animal/add', async (req, res) => {
     });
 });
 
-app.post('/animal/delete', async (req, res) => {
+app.post("/animal/delete", async (req, res) => {
   await prisma.animal
     .delete({
       where: {
@@ -234,6 +294,43 @@ app.post('/animal/delete', async (req, res) => {
     })
     .then(() => {
       res.send().status(200);
+    });
+});
+
+/**
+ * Post Routes
+ */
+
+app.post("/posts/new", async (req, res) => {
+  await prisma.post
+    .create({
+      data: {
+        authorId: req.body.userId,
+        body: req.body.post,
+        created: new Date(),
+      },
+    })
+    .then((post) => {
+      res.send(post);
+    })
+    .catch((error) => {
+      console.log(error);
+    });
+});
+
+/**
+ * TEST Routes
+ */
+
+app.get("/test", async (req, res) => {
+  await prisma.user
+    .findMany({
+      include: {
+        following: true,
+      },
+    })
+    .then((user) => {
+      res.send(user);
     });
 });
 

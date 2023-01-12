@@ -19,6 +19,7 @@
     "react": "^18.2.0",
     "react-animals": "^0.0.82",
     "react-dom": "^18.1.0",
+    "react-hierarchy-chart": "^0.0.3",
     "react-redux": "^8.0.5",
     "react-router-dom": "^6.4.3"
   },

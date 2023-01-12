@@ -10,21 +10,26 @@ datasource db {
 }
 
 model Post {
-  id       String @id @default(auto()) @map("_id") @db.ObjectId
-  slug     String @unique
-  title    String
+  id       String  @id @default(auto()) @map("_id") @db.ObjectId
+  created DateTime
+  title    String?
   body     String
-  author   User   @relation(fields: [authorId], references: [id])
-  authorId String @db.ObjectId
+  author   User    @relation(fields: [authorId], references: [id])
+  authorId String  @db.ObjectId
 }
 
 model User {
-  id       String  @id @default(auto()) @map("_id") @db.ObjectId
-  email    String  @unique
-  name     String?
-  password String
-  avatar   String?
-  posts    Post[]
+  id            String   @id @default(auto()) @map("_id") @db.ObjectId
+  email         String   @unique
+  name          String?
+  password      String
+  avatar        String?
+  posts         Post[]
+  herdle        Animal[]
+  followedBy    User[]   @relation("UserFollows", fields: [followedByIDs], references: [id])
+  followedByIDs String[] @db.ObjectId
+  following     User[]   @relation("UserFollows", fields: [followingIDs], references: [id])
+  followingIDs  String[] @db.ObjectId
 }
 
 model Animal {
@@ -58,6 +63,7 @@ model Animal {
   herdId             String?   @db.ObjectId
   ownerId            String    @db.ObjectId
   photoUrl           String?
+  User               User?     @relation(fields: [ownerId], references: [id])
 }
 
 model Herd {
