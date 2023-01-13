@@ -1,5 +1,7 @@
 import { Post } from "@prisma/client";
 import axios, { AxiosHeaders, AxiosResponse } from "axios";
+import FormData from "form-data";
+import { File } from "formidable";
 import { User } from "../Interfaces/Account";
 import { Animal, Herd } from "../Interfaces/Animal";
 import { appStore } from "../store/store";
@@ -27,8 +29,8 @@ const responseBody = <T>(response: AxiosResponse<T>) => response.data;
 
 const requests = {
   get: <T>(url: string) => axios.get<T>(url).then(responseBody),
-  post: <T>(url: string, body: object) =>
-    axios.post<T>(url, body).then(responseBody),
+  post: <T>(url: string, body: object, headers?: object) =>
+    axios.post<T>(url, body, headers).then(responseBody),
 };
 
 const Account = {
@@ -38,6 +40,17 @@ const Account = {
     requests.get<User>(`/herdle/profile?userId=${userId}`),
   followUserAction: (userId: string, userInQuestion: string) =>
     requests.post<User>("/herdle/followAction", { userId, userInQuestion }),
+  uploadAvatarImage: (userId: string, file: File[]) => {
+    let formData = new FormData();
+    formData.append("file", file[0]);
+    return requests.post<User>(
+      `/herdle/profilePicture/upload?userId=${userId}&location=User`,
+      formData,
+      {
+        headers: { "content-type": "multipart/form-data" },
+      }
+    );
+  },
 };
 
 const Herd = {

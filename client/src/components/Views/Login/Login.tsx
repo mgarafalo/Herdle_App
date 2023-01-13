@@ -23,8 +23,13 @@ export default function Login() {
   async function handleLogin() {
     await agent.Account.login(user)
       .then((response) => {
-        console.log(response);
-        dispatch(setUserState({ email: response.email, id: response.id }));
+        dispatch(
+          setUserState({
+            username: response.username,
+            id: response.id,
+            email: response.email,
+          })
+        );
         dispatch(setToken(response.token!));
         window.localStorage.setItem("Herdle/Auth", JSON.stringify(response));
       })
@@ -38,7 +43,7 @@ export default function Login() {
     <Box className="flex flex-wrap flex-col gap-5 justify-center content-center min-h-screen">
       <TextField
         onChange={(e) => handleChange(e, "email")}
-        label="Email"
+        label="Username"
         variant="outlined"
         sx={{
           "& label.Mui-focused": {

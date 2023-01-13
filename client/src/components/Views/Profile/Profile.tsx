@@ -52,17 +52,19 @@ export default function () {
 
   return (
     <>
-      <Box className="flex flex-wrap min-h-screen content-center justify-center p-7">
+      <Box className="flex flex-wrap h-full content-center justify-center p-5">
         <Box className="flex flex-wrap flex-col content-center justify-between w-full">
           <Box className="flex flex-wrap items-center justify-between w-full p-5">
             <Box className="flex flex-wrap items-center gap-3">
-              <Avatar>{store.user.email[0]}</Avatar>
-              <Typography>{store.user.email}</Typography>
-              <Typography>
-                {userData?.followers?.length ? userData.followers.length : "0"}{" "}
-                Followers
+              <Link to={`/herdle/profile/${store.user.id}`}>
+                <Avatar src={userData!.avatar} sx={{ width: 72, height: 72 }} />
+              </Link>
+              <Typography variant="h4">{store.user.email}</Typography>
+              <Typography sx={{ fontSize: "1rem" }}>
+                {userData?.followers?.length}{" "}
+                {userData?.followers?.length === 1 ? "Follower" : "Followers"}
               </Typography>
-              <Typography>
+              <Typography sx={{ fontSize: "1rem" }}>
                 {userData?.following?.length ? userData.following.length : "0"}{" "}
                 Following
               </Typography>
@@ -108,8 +110,8 @@ export default function () {
                 </Box>
                 <Box className="flex flex-wrap gap-3">
                   {userData?.posts && userData?.posts.length ? (
-                    userData?.posts?.map((post: Post) => (
-                      <PostCard post={post} />
+                    userData?.posts?.map((post: Post, i) => (
+                      <PostCard key={i} post={post} />
                     ))
                   ) : (
                     <></>
@@ -118,8 +120,8 @@ export default function () {
               </Box>
               <Typography variant="h5">{store.user.email}'s Herdle</Typography>
             </Box>
-            <Box className="flex flex-wrap flex-row items-center gap-8 p-5">
-              {userData!.herdle.map((animal, i) => (
+            <Box className="grid-cols-3 w-full p-5">
+              {userData!.herdle!.map((animal, i) => (
                 <AnimalCard
                   key={i}
                   animal={animal}

@@ -7,7 +7,7 @@ export interface User {
   email: string;
   avatar?: string;
   token?: string;
-  herdle: Animal[];
+  herdle?: Animal[];
   followers?: string[];
   following?: string[];
   posts?: Post[];

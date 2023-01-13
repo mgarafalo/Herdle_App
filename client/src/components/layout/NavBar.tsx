@@ -19,7 +19,7 @@ export default function NavBar({ email, id }: props) {
   }
   return (
     <>
-      <AppBar sx={{ backgroundColor: "#588157", padding: 2 }}>
+      <AppBar sx={{ backgroundColor: "#588157", padding: 2, height: 65 }}>
         <div className="flex flex-row justify-between align-center">
           <Typography fontSize={18}>Herdle</Typography>
           <div className="flex flex-row align-center justify-items-center gap-4">

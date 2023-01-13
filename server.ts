@@ -3,10 +3,21 @@ import express from "express";
 import bcrypt from "bcrypt";
 import cors from "cors";
 import jwt from "jsonwebtoken";
+import dotenv from "dotenv";
+import formidable, { IncomingForm } from "formidable";
+import cloudinary from "cloudinary";
+
+dotenv.config();
 
 const PORT = 8080;
 const app = express();
 const prisma = new PrismaClient();
+
+cloudinary.v2.config({
+  cloud_name: process.env.CLOUD_NAME,
+  api_key: process.env.API_KEY,
+  api_secret: process.env.API_SECRET,
+});
 
 app.use(cors());
 app.use(express.json());
@@ -16,9 +27,9 @@ app.use(express.json());
  */
 
 app.post("/login", async (req, res) => {
-  const { email, password } = req.body;
+  const { username, password } = req.body;
   await prisma.user
-    .findFirst({ where: { email: email } })
+    .findFirst({ where: { username: username } })
     .then(async (user: User | null) => {
       if (user === null) {
         res.send("No user found.");
@@ -31,9 +42,12 @@ app.post("/login", async (req, res) => {
               { id: user?.id, email: user?.email },
               "secret"
             );
-            res
-              .header("x-auth-token", token)
-              .send({ id: user?.id, email: user?.email, token });
+            res.header("x-auth-token", token).send({
+              id: user?.id,
+              email: user?.email,
+              username: user?.username,
+              token,
+            });
           }
         });
     });
@@ -65,7 +79,7 @@ app.post("/herdle/new", async (req, res) => {
         }
         await prisma.user.create({
           data: {
-            name: req.body.username,
+            username: req.body.username,
             email: req.body.email,
             password: hashedPw,
           },
@@ -85,12 +99,21 @@ app.get("/herdle/profile", async (req, res) => {
     })
     .then(async (user) => {
       if (!user) res.send().status(400);
-      const { id, name, email, herdle, posts, followedByIDs, followingIDs } =
-        user!;
+      const {
+        id,
+        username,
+        email,
+        avatar,
+        herdle,
+        posts,
+        followedByIDs,
+        followingIDs,
+      } = user!;
       res.send({
         id,
-        name,
+        username,
         email,
+        avatar,
         herdle,
         posts,
         followers: followedByIDs,
@@ -316,6 +339,43 @@ app.post("/posts/new", async (req, res) => {
     .catch((error) => {
       console.log(error);
     });
+});
+
+/**
+ * Image Routes
+ */
+
+app.post("/herdle/profilePicture/upload", async (req, res) => {
+  const form = new IncomingForm();
+  form.parse(req, (err, fields, files) => {
+    const filePath = files.file as formidable.File;
+    console.log({ fields, files });
+    cloudinary.v2.uploader
+      .upload(
+        filePath.filepath,
+        {
+          use_filename: true,
+          folder: `Herdle/${req.query.location}`,
+        },
+        async (cloudError, result) => {
+          await prisma.user
+            .update({
+              where: {
+                id: req.query.userId as string,
+              },
+              data: {
+                avatar: result!.secure_url,
+              },
+            })
+            .then((user) => {
+              res.send(user);
+            });
+        }
+      )
+      .catch((error) => {
+        console.log("error", error);
+      });
+  });
 });
 
 /**
