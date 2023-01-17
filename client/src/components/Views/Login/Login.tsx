@@ -6,6 +6,7 @@ import { User } from "../../../Interfaces/Account";
 import agent from "../../../service/Agent";
 import { setToken, setUserState } from "../../../store/slice";
 import { useNavigate } from "react-router-dom";
+import { motion } from "framer-motion";
 
 export default function Login() {
   const dispatch = useDispatch();
@@ -40,43 +41,53 @@ export default function Login() {
   }
 
   return (
-    <Box className="flex flex-wrap flex-col gap-5 justify-center content-center min-h-screen">
-      <TextField
-        onChange={(e) => handleChange(e, "email")}
-        label="Username"
-        variant="outlined"
-        sx={{
-          "& label.Mui-focused": {
-            color: "#588157",
-          },
-          "& .MuiOutlinedInput-root": {
-            "&.Mui-focused fieldset": {
-              borderColor: "#588157",
+    <motion.div
+      initial={{ opacity: 0, scale: 0.5 }}
+      animate={{ opacity: 1, scale: 1 }}
+      transition={{
+        duration: 0.5,
+        delay: 0.25,
+        ease: [0, 0.71, 0.2, 1.01],
+      }}
+    >
+      <Box className="flex flex-wrap flex-col gap-5 justify-center content-center min-h-screen">
+        <TextField
+          onChange={(e) => handleChange(e, "email")}
+          label="Username"
+          variant="outlined"
+          sx={{
+            "& label.Mui-focused": {
+              color: "#588157",
             },
-          },
-        }}
-      />
-      <TextField
-        onChange={(e) => handleChange(e, "password")}
-        label="Password"
-        variant="outlined"
-        sx={{
-          "& label.Mui-focused": {
-            color: "#588157",
-          },
-          "& .MuiOutlinedInput-root": {
-            "&.Mui-focused fieldset": {
-              borderColor: "#588157",
+            "& .MuiOutlinedInput-root": {
+              "&.Mui-focused fieldset": {
+                borderColor: "#588157",
+              },
             },
-          },
-        }}
-      />
-      <Button
-        sx={{ backgroundColor: "#588157", color: "white" }}
-        onClick={handleLogin}
-      >
-        Submit
-      </Button>
-    </Box>
+          }}
+        />
+        <TextField
+          onChange={(e) => handleChange(e, "password")}
+          label="Password"
+          variant="outlined"
+          sx={{
+            "& label.Mui-focused": {
+              color: "#588157",
+            },
+            "& .MuiOutlinedInput-root": {
+              "&.Mui-focused fieldset": {
+                borderColor: "#588157",
+              },
+            },
+          }}
+        />
+        <Button
+          sx={{ backgroundColor: "#588157", color: "white" }}
+          onClick={handleLogin}
+        >
+          Submit
+        </Button>
+      </Box>
+    </motion.div>
   );
 }

@@ -3,6 +3,7 @@ import { Box } from "@mui/system";
 import { ChangeEvent, SyntheticEvent, useState } from "react";
 import { User } from "../../../Interfaces/Account";
 import agent from "../../../service/Agent";
+import { motion } from "framer-motion";
 
 export default function SignUp() {
   const [user, setUser] = useState<User>({
@@ -34,83 +35,93 @@ export default function SignUp() {
 
   return (
     <>
-      <Box className="flex flex-row flex-wrap min-h-screen">
-        <Box className="flex flex-col w-full items-center">
-          <Typography variant="h1">Create your Herdle</Typography>
-          <Typography variant="h5">Bring your herd to the group</Typography>
-        </Box>
-        <Box className="flex flex-wrap flex-col gap-5 w-full content-center justify-center">
-          <TextField
-            onChange={(e) => handleChange(e, "email")}
-            label="Email"
-            variant="outlined"
-            sx={{
-              "& label.Mui-focused": {
-                color: "#588157",
-              },
-              "& .MuiOutlinedInput-root": {
-                "&.Mui-focused fieldset": {
-                  borderColor: "#588157",
-                },
-              },
-            }}
-          />
-          <TextField
-            onChange={(e) => handleChange(e, "username")}
-            label="Username"
-            variant="outlined"
-            sx={{
-              "& label.Mui-focused": {
-                color: "#588157",
-              },
-              "& .MuiOutlinedInput-root": {
-                "&.Mui-focused fieldset": {
-                  borderColor: "#588157",
-                },
-              },
-            }}
-          />
-          <Box className="flex gap-3 justify-center">
-            <TextField
-              onChange={(e) => handleChange(e, "password")}
-              label="Password"
-              variant="outlined"
-              sx={{
-                "& label.Mui-focused": {
-                  color: "#588157",
-                },
-                "& .MuiOutlinedInput-root": {
-                  "&.Mui-focused fieldset": {
-                    borderColor: "#588157",
-                  },
-                },
-              }}
-            />
-            <TextField
-              value={confirmPassword}
-              onChange={(e) => handleChangeConfirmPassword(e)}
-              label="Confirm Password"
-              variant="outlined"
-              sx={{
-                "& label.Mui-focused": {
-                  color: "#588157",
-                },
-                "& .MuiOutlinedInput-root": {
-                  "&.Mui-focused fieldset": {
-                    borderColor: "#588157",
-                  },
-                },
-              }}
-            />
+      <motion.div
+        initial={{ opacity: 0, scale: 0.5 }}
+        animate={{ opacity: 1, scale: 1 }}
+        transition={{
+          duration: 0.5,
+          delay: 0.25,
+          ease: [0, 0.71, 0.2, 1.01],
+        }}
+      >
+        <Box className="flex flex-row flex-wrap">
+          <Box className="flex flex-col w-full items-center">
+            <Typography variant="h1">Create your Herdle</Typography>
+            <Typography variant="h5">Bring your herd to the group</Typography>
           </Box>
-          <Button
-            sx={{ backgroundColor: "#588157", color: "white" }}
-            onClick={handleClick}
-          >
-            Sign Up
-          </Button>
+          <Box className="flex flex-wrap flex-col gap-5 w-full content-center justify-center">
+            <TextField
+              onChange={(e) => handleChange(e, "email")}
+              label="Email"
+              variant="outlined"
+              sx={{
+                "& label.Mui-focused": {
+                  color: "#588157",
+                },
+                "& .MuiOutlinedInput-root": {
+                  "&.Mui-focused fieldset": {
+                    borderColor: "#588157",
+                  },
+                },
+              }}
+            />
+            <TextField
+              onChange={(e) => handleChange(e, "username")}
+              label="Username"
+              variant="outlined"
+              sx={{
+                "& label.Mui-focused": {
+                  color: "#588157",
+                },
+                "& .MuiOutlinedInput-root": {
+                  "&.Mui-focused fieldset": {
+                    borderColor: "#588157",
+                  },
+                },
+              }}
+            />
+            <Box className="flex gap-3 justify-center">
+              <TextField
+                onChange={(e) => handleChange(e, "password")}
+                label="Password"
+                variant="outlined"
+                sx={{
+                  "& label.Mui-focused": {
+                    color: "#588157",
+                  },
+                  "& .MuiOutlinedInput-root": {
+                    "&.Mui-focused fieldset": {
+                      borderColor: "#588157",
+                    },
+                  },
+                }}
+              />
+              <TextField
+                value={confirmPassword}
+                onChange={(e) => handleChangeConfirmPassword(e)}
+                label="Confirm Password"
+                variant="outlined"
+                sx={{
+                  "& label.Mui-focused": {
+                    color: "#588157",
+                  },
+                  "& .MuiOutlinedInput-root": {
+                    "&.Mui-focused fieldset": {
+                      borderColor: "#588157",
+                    },
+                  },
+                }}
+              />
+            </Box>
+            <Button
+              sx={{ backgroundColor: "#588157", color: "white" }}
+              onClick={handleClick}
+            >
+              Sign Up
+            </Button>
+          </Box>
         </Box>
-      </Box>
+      </motion.div>
     </>
   );
 }

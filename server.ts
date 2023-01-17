@@ -236,7 +236,9 @@ app.post("/herd/add_animal", async (req, res) => {
         id: req.body.animalId as string,
       },
       data: {
-        herdId: req.body.herdId as string,
+        herdId: {
+          push: req.body.herdId as string,
+        },
       },
     })
     .then(async () => {
@@ -253,13 +255,19 @@ app.post("/herd/add_animal", async (req, res) => {
 });
 
 app.post("/herd/remove_animal", async (req, res) => {
+  const animal = await prisma.animal.findFirst({
+    where: { id: req.body.animalId },
+  });
+
   await prisma.animal
     .update({
       where: {
         id: req.body.animalId,
       },
       data: {
-        herdId: "",
+        herdId: {
+          set: animal?.herdId.filter((id: string) => id !== req.body.herdId),
+        },
       },
     })
     .then(async () => {

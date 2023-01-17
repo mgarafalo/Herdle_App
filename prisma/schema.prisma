@@ -60,7 +60,7 @@ model Animal {
   notes              String?
   birthWeight        Int?
   Herd               Herd?     @relation(fields: [herdId], references: [id])
-  herdId             String?   @db.ObjectId
+  herdId             String[]   @db.ObjectId
   ownerId            String    @db.ObjectId
   photoUrl           String?
   User               User?     @relation(fields: [ownerId], references: [id])

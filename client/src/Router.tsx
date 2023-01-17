@@ -8,7 +8,7 @@ import SignUp from "./components/Views/Signup/Signup";
 
 export default function AppRouter() {
   return (
-    <div className="min-vh-screen" style={{ paddingTop: "65px" }}>
+    <div className="min-h-screen" style={{ paddingTop: "65px" }}>
       <Routes>
         <Route path="/login" element={<Login />} />
         <Route path="/signup" element={<SignUp />} />
