@@ -10,26 +10,40 @@ datasource db {
 }
 
 model Post {
-  id       String  @id @default(auto()) @map("_id") @db.ObjectId
-  created DateTime
-  title    String?
-  body     String
-  author   User    @relation(fields: [authorId], references: [id])
-  authorId String  @db.ObjectId
+  id         String   @id @default(auto()) @map("_id") @db.ObjectId
+  created    DateTime
+  title      String?
+  body       String
+  author     User     @relation(fields: [authorId], references: [id])
+  authorId   String   @db.ObjectId
+  likedBy    User[]   @relation("LikedBy", fields: [likedByIDs], references: [id])
+  likedByIDs String[] @db.ObjectId
+}
+
+model Comment {
+  id           String   @id @default(auto()) @map("_id") @db.ObjectId
+  body         String
+  created      DateTime
+  upVotesUsers User[]   @relation("UpVote", fields: [upVotesIDs], references: [id])
+  upVotesIDs   String[] @db.ObjectId
 }
 
 model User {
-  id            String   @id @default(auto()) @map("_id") @db.ObjectId
-  email         String   @unique
-  username          String?
-  password      String
-  avatar        String?
-  posts         Post[]
-  herdle        Animal[]
-  followedBy    User[]   @relation("UserFollows", fields: [followedByIDs], references: [id])
-  followedByIDs String[] @db.ObjectId
-  following     User[]   @relation("UserFollows", fields: [followingIDs], references: [id])
-  followingIDs  String[] @db.ObjectId
+  id                 String    @id @default(auto()) @map("_id") @db.ObjectId
+  email              String    @unique
+  username           String?
+  password           String
+  avatar             String?
+  posts              Post[]
+  herdle             Animal[]
+  followedBy         User[]    @relation("UserFollows", fields: [followedByIDs], references: [id])
+  followedByIDs      String[]  @db.ObjectId
+  following          User[]    @relation("UserFollows", fields: [followingIDs], references: [id])
+  followingIDs       String[]  @db.ObjectId
+  postsLiked         Post[]    @relation("LikedBy", fields: [postsLikedIDs], references: [id])
+  postsLikedIDs      String[]  @db.ObjectId
+  commentsUpvoted    Comment[] @relation("UpVote", fields: [commentsUpVotedIDs], references: [id])
+  commentsUpVotedIDs String[]  @db.ObjectId
 }
 
 model Animal {
@@ -60,7 +74,7 @@ model Animal {
   notes              String?
   birthWeight        Int?
   Herd               Herd?     @relation(fields: [herdId], references: [id])
-  herdId             String[]   @db.ObjectId
+  herdId             String[]  @db.ObjectId
   ownerId            String    @db.ObjectId
   photoUrl           String?
   User               User?     @relation(fields: [ownerId], references: [id])

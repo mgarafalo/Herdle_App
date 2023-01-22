@@ -212,17 +212,14 @@ app.get("/herd/single", async (req, res) => {
 });
 
 app.get("/all_herds", async (req, res) => {
-  await prisma.user
+  await prisma.herd
     .findMany({
       where: {
-        id: req.query.id as string,
-      },
-      include: {
-        herdle: true,
+        ownerId: req.query.id as string,
       },
     })
-    .then((user) => {
-      res.json(user[0].herdle);
+    .then((herds) => {
+      res.json(herds);
     })
     .catch((error) => {
       res.send(error);

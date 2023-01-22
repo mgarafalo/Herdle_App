@@ -44,8 +44,8 @@ export default function SignUp() {
           ease: [0, 0.71, 0.2, 1.01],
         }}
       >
-        <Box className="flex flex-row flex-wrap">
-          <Box className="flex flex-col w-full items-center">
+        <Box className="flex flex-row flex-wrap ">
+          <Box className="flex flex-col w-full items-center p-8">
             <Typography variant="h1">Create your Herdle</Typography>
             <Typography variant="h5">Bring your herd to the group</Typography>
           </Box>
