@@ -329,7 +329,7 @@ app.post("/animal/delete", async (req, res) => {
  * Post Routes
  */
 
-app.post("/posts/new", async (req, res) => {
+app.post("/post/new", async (req, res) => {
   await prisma.post
     .create({
       data: {
@@ -338,11 +338,99 @@ app.post("/posts/new", async (req, res) => {
         created: new Date(),
       },
     })
-    .then((post) => {
-      res.send(post);
+    .then(async (post) => {
+      await prisma.user
+        .findFirst({
+          where: { id: req.body.id as string },
+          include: { herdle: true, posts: true },
+        })
+        .then(async (user) => {
+          if (!user) res.send().status(400);
+          const {
+            id,
+            username,
+            email,
+            avatar,
+            herdle,
+            posts,
+            followedByIDs,
+            followingIDs,
+          } = user!;
+          res.send({
+            id,
+            username,
+            email,
+            avatar,
+            herdle,
+            posts,
+            followers: followedByIDs,
+            following: followingIDs,
+          });
+        });
     })
     .catch((error) => {
       console.log(error);
+    });
+});
+
+app.post("/post/likePost", async (req, res) => {
+  const { userId, postId } = req.body;
+
+  const post = await prisma.post.findFirst({
+    where: {
+      id: postId as string,
+    },
+  });
+
+  await prisma.post
+    .update({
+      where: {
+        id: post?.id,
+      },
+      data: {
+        likedByIDs: {
+          set: post?.likedByIDs.includes(userId)
+            ? post.likedByIDs.filter((id) => id !== userId)
+            : post?.likedByIDs.concat([userId as string]),
+        },
+      },
+    })
+    .then(async () => {
+      const userPosts = await prisma.user.findFirst({
+        where: {
+          id: userId,
+        },
+        include: {
+          posts: true,
+        },
+      });
+      res.send(userPosts);
+    });
+});
+
+app.post("/post/comment", async (req, res) => {
+  const { userId, postId, commentBody } = req.body;
+
+  await prisma.comment
+    .create({
+      data: {
+        userId: userId,
+        body: commentBody,
+        created: new Date(),
+        postId: postId,
+      },
+    })
+    .then(async () => {
+      const post = await prisma.post.findFirst({
+        where: {
+          id: postId as string,
+        },
+        include: {
+          comments: true,
+        },
+      });
+
+      res.send(post);
     });
 });
 

@@ -33,7 +33,7 @@ export default function AnimalCard({ animal, isOwner = false }: Props) {
           <PedigreeTree />
         </Paper>
       </Modal>
-      <Card sx={{ maxWidth: 345 }}>
+      <Card sx={{ width: 345 }}>
         <CardMedia
           sx={{ height: 140 }}
           image={animal.photoUrl ? animal.photoUrl : "../../../goatTemp.jpeg"}

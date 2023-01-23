@@ -1,5 +1,4 @@
 import { Route, Routes } from "react-router-dom";
-import PostCreator from "./components/UI/Posts/PostCreator";
 import HerdView from "./components/Views/Herd/HerdView";
 import Login from "./components/Views/Login/Login";
 import EditProfile from "./components/Views/Profile/EditProfile";
@@ -15,7 +14,6 @@ export default function AppRouter() {
         <Route path="/herdle/:id" element={<Profile />} />
         <Route path="/herdle/:id/herd" element={<HerdView />} />
         <Route path="/herdle/profile/:id" element={<EditProfile />} />
-        <Route path="/posts/new" element={<PostCreator />} />
       </Routes>
     </div>
   );

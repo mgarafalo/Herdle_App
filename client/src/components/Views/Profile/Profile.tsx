@@ -1,6 +1,6 @@
 import { Avatar, Button, Paper, Typography } from "@mui/material";
 import { Box } from "@mui/system";
-import { useEffect, useState } from "react";
+import { SyntheticEvent, useEffect, useState } from "react";
 import { useSelector } from "react-redux";
 import { Link } from "react-router-dom";
 import { User } from "../../../Interfaces/Account";
@@ -11,12 +11,19 @@ import AddBoxIcon from "@mui/icons-material/AddBox";
 import { Post } from "@prisma/client";
 import PostCard from "../../UI/Posts/PostCard";
 import { motion } from "framer-motion";
+import PostCreator from "../../UI/Posts/PostCreator";
+
+export interface PostActions {
+  likePost: any;
+  comment: any;
+}
 
 export default function () {
   const store = useSelector((state: AppState) => state.appState);
 
   const [userData, setUserData] = useState<User>();
   const [loading, setLoading] = useState<boolean>(true);
+  const [commentBody, setCommentBody] = useState<string>();
 
   async function getUserInfo() {
     await agent.Account.getUserInfo(
@@ -25,7 +32,7 @@ export default function () {
       ]
     )
       .then((userInfo) => {
-        console.log(userInfo);
+        // console.log(userInfo);
         const tempUser = { ...userData, ...userInfo };
         setUserData(tempUser);
       })
@@ -44,6 +51,22 @@ export default function () {
       console.log(user);
     });
   }
+
+  function handleUpdateCommentBody(
+    e: SyntheticEvent<HTMLTextAreaElement | HTMLInputElement>
+  ) {
+    setCommentBody(e.currentTarget.value);
+  }
+
+  const postActions: PostActions = {
+    likePost: async (postId: string) =>
+      await agent.Posts.likePost(store.user.id!, postId).then((newUserData) => {
+        const tempUserData = { ...userData!, ...newUserData };
+        setUserData(tempUserData);
+      }),
+    comment: async (postId: string) =>
+      await agent.Posts.comment(store.user.id!, postId, commentBody!),
+  };
 
   useEffect(() => {
     getUserInfo();
@@ -106,30 +129,25 @@ export default function () {
                 </Button>
               </Link>
             </Box>
-            <Box className="flex flex-col">
-              <Box className="flex flex-col pl-5 gap-8">
+            <Box className="flex flex-row justify-between">
+              <Box className="flex flex-col pl-5 gap-8 w-3/12">
                 <Box className="flex flex-col gap-3">
                   <Box className="flex flex-row gap-3">
                     <Typography variant="h5">Posts</Typography>
                     {store.user.id ===
                       window.location.href.split("/")[
                         window.location.href.split("/").length - 1
-                      ] && (
-                      <Link to={"/posts/new"}>
-                        <Button
-                          className="flex gap-1"
-                          sx={{ color: "#588157" }}
-                        >
-                          <AddBoxIcon />
-                          New Post
-                        </Button>
-                      </Link>
-                    )}
+                      ] && <PostCreator setUserData={setUserData} />}
                   </Box>
-                  <Box className="flex flex-wrap gap-3">
+                  <Box className="flex flex-wrap flex-col gap-3 w-full">
                     {userData?.posts && userData?.posts.length ? (
                       userData?.posts?.map((post: Post, i) => (
-                        <PostCard key={i} post={post} />
+                        <PostCard
+                          key={i}
+                          post={post}
+                          actions={postActions}
+                          handleUpdateCommentBody={handleUpdateCommentBody}
+                        />
                       ))
                     ) : (
                       <></>
@@ -138,17 +156,19 @@ export default function () {
                 </Box>
               </Box>
 
-              <Typography className="p-3" variant="h5">
-                {store.user.email}'s Herdle
-              </Typography>
-              <Box className="flex flex-wrap flex-row gap-8 p-5">
-                {userData!.herdle!.map((animal, i) => (
-                  <AnimalCard
-                    key={i}
-                    animal={animal}
-                    isOwner={animal.ownerId === store.user.id}
-                  />
-                ))}
+              <Box className="flex flex-col w-8/12 justify-end">
+                <Typography className="pl-5" variant="h5">
+                  {store.user.email}'s Herdle
+                </Typography>
+                <Box className="flex flex-wrap flex-row gap-3 p-5">
+                  {userData!.herdle!.map((animal, i) => (
+                    <AnimalCard
+                      key={i}
+                      animal={animal}
+                      isOwner={animal.ownerId === store.user.id}
+                    />
+                  ))}
+                </Box>
               </Box>
             </Box>
           </Box>
