@@ -26,6 +26,8 @@ model Comment {
   created      DateTime
   upVotesUsers User[]   @relation("UpVote", fields: [upVotesIDs], references: [id])
   upVotesIDs   String[] @db.ObjectId
+  DownVotesUsers User[]   @relation("DownVote", fields: [DownVotesIDs], references: [id])
+  DownVotesIDs   String[] @db.ObjectId
 }
 
 model User {
@@ -42,8 +44,10 @@ model User {
   followingIDs       String[]  @db.ObjectId
   postsLiked         Post[]    @relation("LikedBy", fields: [postsLikedIDs], references: [id])
   postsLikedIDs      String[]  @db.ObjectId
-  commentsUpvoted    Comment[] @relation("UpVote", fields: [commentsUpVotedIDs], references: [id])
+  commentsUpVoted    Comment[] @relation("UpVote", fields: [commentsUpVotedIDs], references: [id])
   commentsUpVotedIDs String[]  @db.ObjectId
+  commentsDownVoted    Comment[] @relation("DownVote", fields: [commentsDownVotedIDs], references: [id])
+  commentsDownVotedIDs String[]  @db.ObjectId
 }
 
 model Animal {
