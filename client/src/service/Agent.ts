@@ -78,9 +78,9 @@ const Posts = {
   newPost: (userId: string, post: string) =>
     requests.post<Post>(`/post/new`, { userId, post }),
   likePost: (userId: string, postId: string) =>
-    requests.post<Post[]>("/post/likePost", { userId, postId }),
+    requests.post<User>("/post/likePost", { userId, postId }),
   comment: (userId: string, postId: string, commentBody: string) =>
-    requests.post<Post>("/post/comment", { userId, postId, commentBody }),
+    requests.post<User>("/post/comment", { userId, postId, commentBody }),
 };
 
 const agent = {

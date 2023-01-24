@@ -95,7 +95,14 @@ app.get("/herdle/profile", async (req, res) => {
   await prisma.user
     .findFirst({
       where: { id: req.query.id as string },
-      include: { herdle: true, posts: true },
+      include: {
+        herdle: true,
+        posts: {
+          include: {
+            comments: true,
+          },
+        },
+      },
     })
     .then(async (user) => {
       if (!user) res.send().status(400);
@@ -421,16 +428,20 @@ app.post("/post/comment", async (req, res) => {
       },
     })
     .then(async () => {
-      const post = await prisma.post.findFirst({
+      const user = await prisma.user.findFirst({
         where: {
-          id: postId as string,
+          id: userId as string,
         },
         include: {
-          comments: true,
+          posts: {
+            include: {
+              comments: true,
+            },
+          },
         },
       });
 
-      res.send(post);
+      res.send(user);
     });
 });
 

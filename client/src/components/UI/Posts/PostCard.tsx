@@ -1,12 +1,12 @@
 import { Badge, Button, Paper, TextField, Typography } from "@mui/material";
 import { Box } from "@mui/system";
-import { Post } from "@prisma/client";
 import { DateTime } from "luxon";
 import ThumbUpOutlinedIcon from "@mui/icons-material/ThumbUpOutlined";
 import AddCommentOutlinedIcon from "@mui/icons-material/AddCommentOutlined";
 import { PostActions } from "../../Views/Profile/Profile";
 import { motion } from "framer-motion";
 import { useState } from "react";
+import { Post } from "../../../Interfaces/Posts";
 
 interface Props {
   post: Post;
@@ -40,10 +40,15 @@ export default function PostCard({
               </Badge>
             </Button>
             <Button onClick={() => setShowCommentBox(!showCommentBox)}>
-              <AddCommentOutlinedIcon
-                fontSize="medium"
+              <Badge
+                badgeContent={post.comments?.length}
                 sx={{ color: "#588157" }}
-              />
+              >
+                <AddCommentOutlinedIcon
+                  fontSize="medium"
+                  sx={{ color: "#588157" }}
+                />
+              </Badge>
             </Button>
           </Box>
           <Box>
@@ -66,6 +71,11 @@ export default function PostCard({
               ease: [0, 0.71, 0.2, 1.01],
             }}
           >
+            {post.comments &&
+              post.comments.length > 0 &&
+              post.comments.map((comment, i) => (
+                <Box key={i}>{comment.body}</Box>
+              ))}
             <TextField
               className="w-full"
               onChange={(e) => handleUpdateCommentBody(e)}
@@ -85,7 +95,7 @@ export default function PostCard({
             />
             <Button
               className="w-3/12"
-              onClick={() => actions.comment()}
+              onClick={() => actions.comment(post.id)}
               sx={{ backgroundColor: "#588157", color: "white" }}
             >
               Submit

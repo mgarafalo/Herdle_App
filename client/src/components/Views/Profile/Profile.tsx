@@ -1,4 +1,4 @@
-import { Avatar, Button, Paper, Typography } from "@mui/material";
+import { Avatar, Button, Typography } from "@mui/material";
 import { Box } from "@mui/system";
 import { SyntheticEvent, useEffect, useState } from "react";
 import { useSelector } from "react-redux";
@@ -7,7 +7,6 @@ import { User } from "../../../Interfaces/Account";
 import agent from "../../../service/Agent";
 import { AppState } from "../../../store/store";
 import AnimalCard from "../../UI/Animal/AnimalCards";
-import AddBoxIcon from "@mui/icons-material/AddBox";
 import { Post } from "@prisma/client";
 import PostCard from "../../UI/Posts/PostCard";
 import { motion } from "framer-motion";
@@ -25,6 +24,11 @@ export default function () {
   const [loading, setLoading] = useState<boolean>(true);
   const [commentBody, setCommentBody] = useState<string>();
 
+  function updateUser(newUserData: User) {
+    const tempUserData = { ...userData!, ...newUserData };
+    setUserData(tempUserData);
+  }
+
   async function getUserInfo() {
     await agent.Account.getUserInfo(
       window.location.href.split("/")[
@@ -32,9 +36,7 @@ export default function () {
       ]
     )
       .then((userInfo) => {
-        // console.log(userInfo);
-        const tempUser = { ...userData, ...userInfo };
-        setUserData(tempUser);
+        updateUser(userInfo);
       })
       .finally(() => {
         setLoading(false);
@@ -61,11 +63,14 @@ export default function () {
   const postActions: PostActions = {
     likePost: async (postId: string) =>
       await agent.Posts.likePost(store.user.id!, postId).then((newUserData) => {
-        const tempUserData = { ...userData!, ...newUserData };
-        setUserData(tempUserData);
+        updateUser(newUserData);
       }),
     comment: async (postId: string) =>
-      await agent.Posts.comment(store.user.id!, postId, commentBody!),
+      await agent.Posts.comment(store.user.id!, postId, commentBody!).then(
+        (newUserData) => {
+          updateUser(newUserData);
+        }
+      ),
   };
 
   useEffect(() => {
@@ -156,7 +161,7 @@ export default function () {
                 </Box>
               </Box>
 
-              <Box className="flex flex-col w-8/12 justify-end">
+              <Box className="flex flex-col w-8/12">
                 <Typography className="pl-5" variant="h5">
                   {store.user.email}'s Herdle
                 </Typography>

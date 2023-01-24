@@ -1,6 +1,6 @@
-import { AppBar, Button, Link, Typography } from "@mui/material";
+import { AppBar, Button, Typography } from "@mui/material";
 import { useDispatch, useSelector } from "react-redux";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, Link } from "react-router-dom";
 import { getAppState, setUserState, State } from "../../store/slice";
 
 interface props {
@@ -21,20 +21,22 @@ export default function NavBar({ email, id }: props) {
     <>
       <AppBar sx={{ backgroundColor: "#588157", padding: 2, height: 65 }}>
         <div className="flex flex-row justify-between align-center">
-          <Typography fontSize={18}>Herdle</Typography>
+          <Link to="/">
+            <Typography fontSize={18}>Herdle</Typography>
+          </Link>
           <div className="flex flex-row align-center justify-items-center gap-4">
             {email === "" ? (
               <>
-                <Link href="/login">
+                <Link to="/login">
                   <Button sx={{ color: "white" }}>Login</Button>
                 </Link>
-                <Link href="/signup">
+                <Link to="/signup">
                   <Button sx={{ color: "white" }}>Sign Up</Button>
                 </Link>
               </>
             ) : (
               <>
-                <Link href={`/herdle/${id}`}>
+                <Link to={`/herdle/${id}`}>
                   <Button sx={{ color: "white" }}>{email}</Button>
                 </Link>
                 <Button onClick={handleLogout} sx={{ color: "white" }}>
