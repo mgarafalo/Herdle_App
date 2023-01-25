@@ -11,6 +11,7 @@ import { Post } from "@prisma/client";
 import PostCard from "../../UI/Posts/PostCard";
 import { motion } from "framer-motion";
 import PostCreator from "../../UI/Posts/PostCreator";
+import { Audio } from "react-loader-spinner";
 
 export interface PostActions {
   likePost: any;
@@ -65,19 +66,34 @@ export default function () {
       await agent.Posts.likePost(store.user.id!, postId).then((newUserData) => {
         updateUser(newUserData);
       }),
-    comment: async (postId: string) =>
-      await agent.Posts.comment(store.user.id!, postId, commentBody!).then(
-        (newUserData) => {
-          updateUser(newUserData);
-        }
-      ),
+    comment: async (postId: string) => {
+      if (commentBody?.length && commentBody !== " ") {
+        await agent.Posts.comment(store.user.id!, postId, commentBody!).then(
+          (newUserData) => {
+            updateUser(newUserData);
+          }
+        );
+      } else {
+        alert("Please enter a comment");
+      }
+    },
   };
 
   useEffect(() => {
     getUserInfo();
   }, []);
 
-  if (loading) return <div>loading</div>;
+  if (loading)
+    return (
+      <Box className="w-full flex content-center justify-center">
+        <Audio
+          height="80"
+          width="80"
+          color="green"
+          ariaLabel="three-dots-loading"
+        />
+      </Box>
+    );
 
   return (
     <>

@@ -22,12 +22,13 @@
     "framer-motion": "^8.4.3",
     "luxon": "^3.2.1",
     "react": "^18.2.0",
-    "react-animals": "^0.0.82",
     "react-dom": "^18.1.0",
     "react-dropzone": "^14.2.3",
     "react-hierarchy-chart": "^0.0.3",
+    "react-loader-spinner": "^5.3.4",
     "react-redux": "^8.0.5",
-    "react-router-dom": "^6.4.3"
+    "react-router-dom": "^6.4.3",
+    "react-use-measure": "^2.1.1"
   },
   "devDependencies": {
     "@types/react": "^18.0.26",

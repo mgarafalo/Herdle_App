@@ -13,7 +13,6 @@ import {
 import ShareIcon from "@mui/icons-material/Share";
 import ViewTimelineIcon from "@mui/icons-material/ViewTimeline";
 import EditIcon from "@mui/icons-material/Edit";
-import Animal from "react-animals";
 import PedigreeTree from "./PedigreeTree";
 import { useState } from "react";
 import { Animal as AnimalInterface } from "@prisma/client";
@@ -44,7 +43,6 @@ export default function AnimalCard({ animal, isOwner = false }: Props) {
             <Typography gutterBottom fontSize={22}>
               {animal.name} - {animal.breed}
             </Typography>
-            <Animal circle name="sheep" size={"25px"} />
           </Box>
           <Typography variant="body2" color="text.secondary">
             Fill this content with the animal's data

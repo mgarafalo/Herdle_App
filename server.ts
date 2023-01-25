@@ -99,7 +99,15 @@ app.get("/herdle/profile", async (req, res) => {
         herdle: true,
         posts: {
           include: {
-            comments: true,
+            comments: {
+              include: {
+                user: {
+                  select: {
+                    avatar: true,
+                  },
+                },
+              },
+            },
           },
         },
       },
