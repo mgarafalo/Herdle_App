@@ -3,20 +3,14 @@ import { useSelector } from "react-redux";
 import agent from "../../../service/Agent";
 import { AppState } from "../../../store/store";
 
-export default function FileDropzone() {
-  const store = useSelector((state: AppState) => state.appState.user);
+interface Props {
+  onDrop: any;
+}
 
-  async function OnDrop(file: any): Promise<any> {
-    await agent.Account.uploadAvatarImage(store.id!, file).then(
-      (response: any) => {
-        console.log(response);
-      }
-    );
-  }
-
+export default function FileDropzone({ onDrop }: Props) {
   return (
     <>
-      <Dropzone onDrop={(acceptedFiles) => OnDrop(acceptedFiles)}>
+      <Dropzone onDrop={(acceptedFiles) => onDrop(acceptedFiles)}>
         {({ getRootProps, getInputProps }) => (
           <section>
             <div {...getRootProps()}>

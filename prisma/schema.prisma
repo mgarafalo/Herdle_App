@@ -19,6 +19,7 @@ model Post {
   likedBy    User[]    @relation("LikedBy", fields: [likedByIDs], references: [id])
   likedByIDs String[]  @db.ObjectId
   comments   Comment[]
+  img String?
 }
 
 model Comment {

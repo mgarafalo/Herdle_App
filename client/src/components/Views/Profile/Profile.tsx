@@ -118,12 +118,14 @@ export default function () {
                 </Link>
                 <Typography variant="h4">{store.user.email}</Typography>
                 <Typography sx={{ fontSize: "1rem" }}>
-                  {userData?.followers?.length}{" "}
-                  {userData?.followers?.length === 1 ? "Follower" : "Followers"}
+                  {userData?.followedByIDs?.length}{" "}
+                  {userData?.followingIDs?.length === 1
+                    ? "Follower"
+                    : "Followers"}
                 </Typography>
                 <Typography sx={{ fontSize: "1rem" }}>
-                  {userData?.following?.length
-                    ? userData.following.length
+                  {userData?.followedByIDs?.length
+                    ? userData.followingIDs?.length
                     : "0"}{" "}
                   Following
                 </Typography>

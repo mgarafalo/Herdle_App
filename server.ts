@@ -6,6 +6,7 @@ import jwt from "jsonwebtoken";
 import dotenv from "dotenv";
 import formidable, { IncomingForm } from "formidable";
 import cloudinary from "cloudinary";
+import { findUser, imageUploader } from "./Utilities/helpers";
 
 dotenv.config();
 
@@ -92,49 +93,12 @@ app.post("/herdle/new", async (req, res) => {
 });
 
 app.get("/herdle/profile", async (req, res) => {
-  await prisma.user
-    .findFirst({
-      where: { id: req.query.id as string },
-      include: {
-        herdle: true,
-        posts: {
-          include: {
-            comments: {
-              include: {
-                user: {
-                  select: {
-                    avatar: true,
-                  },
-                },
-              },
-            },
-          },
-        },
-      },
-    })
-    .then(async (user) => {
-      if (!user) res.send().status(400);
-      const {
-        id,
-        username,
-        email,
-        avatar,
-        herdle,
-        posts,
-        followedByIDs,
-        followingIDs,
-      } = user!;
-      res.send({
-        id,
-        username,
-        email,
-        avatar,
-        herdle,
-        posts,
-        followers: followedByIDs,
-        following: followingIDs,
-      });
+  await findUser(req.query.userId as string).then(async (user) => {
+    if (!user) res.send().status(400);
+    res.send({
+      ...user,
     });
+  });
 });
 
 app.post("/herdle/followAction", async (req, res) => {
@@ -345,47 +309,42 @@ app.post("/animal/delete", async (req, res) => {
  */
 
 app.post("/post/new", async (req, res) => {
-  await prisma.post
-    .create({
-      data: {
-        authorId: req.body.userId,
-        body: req.body.post,
-        created: new Date(),
-      },
-    })
-    .then(async (post) => {
-      await prisma.user
-        .findFirst({
-          where: { id: req.body.id as string },
-          include: { herdle: true, posts: true },
+  const form = new IncomingForm();
+  form.parse(req, async (err, fields, files) => {
+    if (files) {
+      await prisma.post
+        .create({
+          data: {
+            authorId: fields.userId as string,
+            body: fields.post as string,
+            created: new Date(),
+          },
         })
-        .then(async (user) => {
-          if (!user) res.send().status(400);
-          const {
-            id,
-            username,
-            email,
-            avatar,
-            herdle,
-            posts,
-            followedByIDs,
-            followingIDs,
-          } = user!;
-          res.send({
-            id,
-            username,
-            email,
-            avatar,
-            herdle,
-            posts,
-            followers: followedByIDs,
-            following: followingIDs,
+        .then(async (post) => {
+          await imageUploader(
+            files.file as formidable.File,
+            `Herdle/posts/${post.id}`
+          ).then(async (result) => {
+            if (result) {
+              await prisma.post.update({
+                where: {
+                  id: post.id,
+                },
+                data: {
+                  img: result.secure_url,
+                },
+              });
+            }
           });
         });
-    })
-    .catch((error) => {
-      console.log(error);
+    }
+    await findUser(req.body.userId).then(async (user) => {
+      if (!user) res.send().status(400);
+      res.send({
+        ...user,
+      });
     });
+  });
 });
 
 app.post("/post/likePost", async (req, res) => {
@@ -459,31 +418,25 @@ app.post("/post/comment", async (req, res) => {
 
 app.post("/herdle/profilePicture/upload", async (req, res) => {
   const form = new IncomingForm();
-  form.parse(req, (err, fields, files) => {
-    const filePath = files.file as formidable.File;
-    console.log({ fields, files });
-    cloudinary.v2.uploader
-      .upload(
-        filePath.filepath,
-        {
-          use_filename: true,
-          folder: `Herdle/${req.query.location}`,
-        },
-        async (cloudError, result) => {
-          await prisma.user
-            .update({
-              where: {
-                id: req.query.userId as string,
-              },
-              data: {
-                avatar: result!.secure_url,
-              },
-            })
-            .then((user) => {
-              res.send(user);
-            });
-        }
-      )
+  form.parse(req, async (err, fields, files) => {
+    await imageUploader(
+      files.file as formidable.File,
+      `Herdle/${req.query.location}`
+    )
+      .then(async (result) => {
+        await prisma.user
+          .update({
+            where: {
+              id: req.query.userId as string,
+            },
+            data: {
+              avatar: result!.secure_url,
+            },
+          })
+          .then((user) => {
+            res.send(user);
+          });
+      })
       .catch((error) => {
         console.log("error", error);
       });

@@ -8,7 +8,7 @@ export interface User {
   avatar?: string;
   token?: string;
   herdle?: Animal[];
-  followers?: string[];
-  following?: string[];
+  followedByIDs?: string[];
+  followingIDs?: string[];
   posts?: Post[];
 }

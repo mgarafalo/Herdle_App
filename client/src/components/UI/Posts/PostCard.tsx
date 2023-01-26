@@ -36,7 +36,10 @@ export default function PostCard({
           sx={{ backgroundColor: "white" }}
           className="pt-5 pl-5 pr-5 w-full rounded-lg"
         >
-          <Typography>{post.title ? post.title : <></>}</Typography>
+          {post.img && <img src={post.img} />}
+          <Typography className={post.img ? "pt-3" : ""}>
+            {post.title ? post.title : <></>}
+          </Typography>
           <Typography>{post.body}</Typography>
           <Box className="flex flex-row justify-between p-2 gap-2">
             <Box className="flex flex-row">

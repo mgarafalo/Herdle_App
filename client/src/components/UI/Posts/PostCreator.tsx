@@ -1,4 +1,5 @@
 import {
+  Box,
   Button,
   Dialog,
   DialogActions,
@@ -12,6 +13,8 @@ import AddBoxIcon from "@mui/icons-material/AddBox";
 import { useSelector } from "react-redux";
 import { AppState } from "../../../store/store";
 import agent from "../../../service/Agent";
+import Dropzone from "react-dropzone";
+import { File } from "formidable";
 
 interface Props {
   setUserData: any;
@@ -22,12 +25,16 @@ export default function PostCreator({ setUserData }: Props) {
 
   const [showDialog, setShowDialog] = useState<boolean>(false);
   const [post, setPost] = useState<string>();
+  const [file, setFile] = useState<File[]>();
 
   async function createNewPost() {
-    await agent.Posts.newPost(store.id!, post!).then((userData) => {
-      setUserData(userData);
-      setShowDialog(false);
-    });
+    await agent.Posts.newPost(store.id!, post!, file!)
+      .then((userData) => {
+        setUserData(userData);
+      })
+      .finally(() => {
+        setShowDialog(false);
+      });
   }
 
   function handleChange(
@@ -36,10 +43,12 @@ export default function PostCreator({ setUserData }: Props) {
     setPost(e.currentTarget.value);
   }
 
-  // async function handleClick() {}
-
   function handleShowDialog() {
     setShowDialog(!showDialog);
+  }
+
+  function onDrop(file: any) {
+    setFile(file);
   }
 
   return (
@@ -53,13 +62,33 @@ export default function PostCreator({ setUserData }: Props) {
         New Post
       </Button>
       <Dialog fullWidth open={showDialog} onClose={handleShowDialog}>
-        <DialogTitle>New post</DialogTitle>
+        <DialogTitle>Create a new post to share with your friends!</DialogTitle>
         <DialogContent>
-          <DialogContentText>
-            Create a new post to share with your friends!
-          </DialogContentText>
+          <Box className="flex flex-col gap-3 pt-3 pb-3">
+            <DialogContentText>Add an image</DialogContentText>
+            <Dropzone onDrop={(acceptedFiles) => onDrop(acceptedFiles)}>
+              {({ getRootProps, getInputProps }) => (
+                <section
+                  className="p-5"
+                  style={{
+                    backgroundColor: "whitesmoke",
+                    border: "3px dotted black",
+                    borderRadius: "10px",
+                    cursor: "pointer",
+                  }}
+                >
+                  <div {...getRootProps()}>
+                    <input {...getInputProps()} />
+                    <p>
+                      Drag 'n' drop some files here, or click to select files
+                    </p>
+                  </div>
+                </section>
+              )}
+            </Dropzone>
+          </Box>
           <TextField
-            autoFocus
+            className="p-5"
             margin="dense"
             id="name"
             label="New Post"
@@ -67,6 +96,16 @@ export default function PostCreator({ setUserData }: Props) {
             fullWidth
             variant="standard"
             onChange={(e) => handleChange(e)}
+            sx={{
+              "& label.Mui-focused": {
+                color: "#588157",
+              },
+              "& .MuiOutlinedInput-root": {
+                "&.Mui-focused fieldset": {
+                  borderColor: "#588157",
+                },
+              },
+            }}
           />
         </DialogContent>
         <DialogActions>

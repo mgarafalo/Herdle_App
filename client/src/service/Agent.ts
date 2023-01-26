@@ -40,17 +40,11 @@ const Account = {
     requests.get<User>(`/herdle/profile?userId=${userId}`),
   followUserAction: (userId: string, userInQuestion: string) =>
     requests.post<User>("/herdle/followAction", { userId, userInQuestion }),
-  uploadAvatarImage: (userId: string, file: File[]) => {
-    let formData = new FormData();
-    formData.append("file", file[0]);
-    return requests.post<User>(
-      `/herdle/profilePicture/upload?userId=${userId}&location=User`,
-      formData,
-      {
-        headers: { "content-type": "multipart/form-data" },
-      }
-    );
-  },
+  uploadAvatarImage: (userId: string, file: File[]) =>
+    imageUploadHelper<User>(
+      file,
+      `/herdle/profilePicture/upload?userId=${userId}&location=User`
+    ),
 };
 
 const Herd = {
@@ -75,8 +69,8 @@ const Animal = {
 };
 
 const Posts = {
-  newPost: (userId: string, post: string) =>
-    requests.post<Post>(`/post/new`, { userId, post }),
+  newPost: (userId: string, post: string, file: File[]) =>
+    imageUploadHelper(file, `/post/new`, { userId, post }),
   likePost: (userId: string, postId: string) =>
     requests.post<User>("/post/likePost", { userId, postId }),
   comment: (userId: string, postId: string, commentBody: string) =>
@@ -89,4 +83,19 @@ const agent = {
   Animal,
   Posts,
 };
+
 export default agent;
+
+function imageUploadHelper<T>(file: File[], url: string, body?: any) {
+  let formData = new FormData();
+  formData.append("file", file[0]);
+  if (body) {
+    Object.entries(body).forEach((value: any) => {
+      console.log(value);
+      formData.append(`${value[0]}`, value[1]);
+    });
+  }
+  return requests.post<T>(url, formData, {
+    headers: { "content-type": "multipart/form-data" },
+  });
+}
