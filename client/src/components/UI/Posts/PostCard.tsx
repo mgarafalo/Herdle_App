@@ -14,7 +14,6 @@ import { PostActions } from "../../Views/Profile/Profile";
 import { motion, MotionConfig } from "framer-motion";
 import { useState } from "react";
 import { Post } from "../../../Interfaces/Posts";
-import useMeasure from "react-use-measure";
 
 interface Props {
   post: Post;

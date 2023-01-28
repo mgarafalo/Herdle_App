@@ -395,21 +395,18 @@ app.post("/post/comment", async (req, res) => {
       },
     })
     .then(async () => {
-      const user = await prisma.user.findFirst({
-        where: {
-          id: userId as string,
-        },
-        include: {
-          posts: {
-            include: {
-              comments: true,
-            },
-          },
-        },
+      await findUser(userId).then((user) => {
+        res.send(user);
       });
-
-      res.send(user);
     });
+});
+
+app.delete("/post", async (req, res) => {
+  await prisma.post.delete({
+    where: {
+      id: req.body.postId,
+    },
+  });
 });
 
 /**
