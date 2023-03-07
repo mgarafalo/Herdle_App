@@ -1,6 +1,7 @@
 import formidable from "formidable";
 import cloudinary from "cloudinary";
-import { PrismaClient } from "@prisma/client";
+import { findSingleGeneric, getPrismaModel, ModelName } from "./Prisma";
+import { PrismaClient, User } from "@prisma/client";
 
 const prisma = new PrismaClient();
 
@@ -11,8 +12,7 @@ cloudinary.v2.config({
 });
 
 export async function findUser(userId: string) {
-  return await prisma.user.findFirst({
-    where: { id: userId as string },
+  return await findSingleGeneric<User>("user", "id", userId, {
     select: {
       id: true,
       username: true,
@@ -56,7 +56,6 @@ export function imageUploader(
           folder: folderLocation,
         },
         (cloudError, result) => {
-          console.log(result);
           if (cloudError) {
             console.log(cloudError);
           }

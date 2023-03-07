@@ -44,6 +44,8 @@ export default function PostCreator({ setUserData }: Props) {
   }
 
   function handleShowDialog() {
+    setPost(undefined);
+    setFile(undefined);
     setShowDialog(!showDialog);
   }
 

@@ -34,7 +34,7 @@ const requests = {
 };
 
 const Account = {
-  login: (user: User) => requests.post<User>("/login", user),
+  login: (user: User) => requests.post<User>("/herdle/login", user),
   signUp: (user: User) => requests.post<User>("/herdle/new", user),
   getUserInfo: (userId: string) =>
     requests.get<User>(`/herdle/profile?userId=${userId}`),
@@ -62,6 +62,8 @@ const Herd = {
 const Animal = {
   getUsersAnimals: (userId: string) =>
     requests.get<Animal[]>(`/herdle/animals?userId=${userId}`),
+  getSingleAnimal: (animalId: string) =>
+    requests.get<Animal>(`/animal/single?animalId=${animalId}`),
   newAnimal: (animal: Animal, userId: string) =>
     requests.post<Animal>(`/animal/add?userId=${userId}`, animal),
   deleteAnimal: (animalId: string) =>
@@ -69,8 +71,17 @@ const Animal = {
 };
 
 const Posts = {
-  newPost: (userId: string, post: string, file: File[]) =>
-    imageUploadHelper(file, `/post/new`, { userId, post }),
+  allPosts: () => requests.get<Post[]>("/post/serve"),
+  newPost: (
+    userId: string,
+    post: string,
+    file: File[] | undefined = undefined
+  ) => {
+    if (!!file) {
+      return imageUploadHelper(file, `/post/new`, { userId, post });
+    }
+    return requests.post<Post>("/post/new", { userId, post });
+  },
   likePost: (userId: string, postId: string) =>
     requests.post<User>("/post/likePost", { userId, postId }),
   comment: (userId: string, postId: string, commentBody: string) =>

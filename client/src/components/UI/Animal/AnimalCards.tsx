@@ -16,6 +16,7 @@ import EditIcon from "@mui/icons-material/Edit";
 import PedigreeTree from "./PedigreeTree";
 import { useState } from "react";
 import { Animal as AnimalInterface } from "@prisma/client";
+import { Link } from "react-router-dom";
 
 interface Props {
   animal: AnimalInterface;
@@ -56,9 +57,11 @@ export default function AnimalCard({ animal, isOwner = false }: Props) {
             <ShareIcon sx={{ color: "#588157" }} />
           </Button>
           {isOwner && (
-            <Button size="small">
-              <EditIcon sx={{ color: "#588157" }} />
-            </Button>
+            <Link to={`/animal/view/${animal.id}`}>
+              <Button size="small">
+                <EditIcon sx={{ color: "#588157" }} />
+              </Button>
+            </Link>
           )}
         </CardActions>
       </Card>

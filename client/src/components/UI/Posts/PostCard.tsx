@@ -1,11 +1,4 @@
-import {
-  Avatar,
-  Badge,
-  Button,
-  Paper,
-  TextField,
-  Typography,
-} from "@mui/material";
+import { Avatar, Badge, Button, Typography } from "@mui/material";
 import { Box } from "@mui/system";
 import { DateTime } from "luxon";
 import ThumbUpOutlinedIcon from "@mui/icons-material/ThumbUpOutlined";
@@ -14,19 +7,23 @@ import { PostActions } from "../../Views/Profile/Profile";
 import { motion, MotionConfig } from "framer-motion";
 import { useState } from "react";
 import { Post } from "../../../Interfaces/Posts";
+import agent from "../../../service/Agent";
+import CommentCreator from "../Comments/CommentCreator";
+import usePostMutation from "../../../api/Mutations/usePostMutation";
 
 interface Props {
   post: Post;
-  actions: PostActions;
-  handleUpdateCommentBody: any;
+  userId: string;
+  updateData: any;
 }
 
-export default function PostCard({
-  post,
-  actions,
-  handleUpdateCommentBody,
-}: Props) {
+export default function PostCard({ userId, post, updateData }: Props) {
   const [showCommentBox, setShowCommentBox] = useState<Boolean>(false);
+  const { mutate } = usePostMutation({ userId, payload: post.id });
+
+  const actions: PostActions = {
+    likePost: () => mutate(),
+  };
 
   return (
     <>
@@ -99,30 +96,13 @@ export default function PostCard({
                       <Typography fontSize={14}>{comment.body}</Typography>
                     </Box>
                   ))}
-                <TextField
-                  className="w-full"
-                  onChange={(e) => handleUpdateCommentBody(e)}
-                  variant="outlined"
-                  label="New Comment"
-                  sx={{
-                    "& label.Mui-focused": {
-                      color: "#588157",
-                    },
-                    "& .MuiOutlinedInput-root": {
-                      "&.Mui-focused fieldset": {
-                        borderColor: "#588157",
-                      },
-                    },
-                    lineBreak: "loose",
-                  }}
-                />
-                <Button
-                  className="w-3/12"
-                  onClick={() => actions.comment(post.id)}
-                  sx={{ backgroundColor: "#588157", color: "white" }}
-                >
-                  Submit
-                </Button>
+                <Box className="p-5 flex flex-col justify-start w-full gap-3">
+                  <CommentCreator
+                    postId={post.id}
+                    userId={userId}
+                    updateData={updateData}
+                  />
+                </Box>
               </Box>
             </motion.div>
           )}

@@ -83,7 +83,7 @@ model Animal {
   dam                String?
   damSire            String?
   breeder            String?
-  notes              String?
+  notes              Note[]
   birthWeight        Int?
   Herd               Herd?     @relation(fields: [herdId], references: [id])
   herdId             String[]  @db.ObjectId
@@ -98,4 +98,13 @@ model Herd {
   animals Animal[]
   User User @relation(fields: [ownerId], references: [id])
   ownerId String   @db.ObjectId
+}
+
+model Note {
+  id                 String    @id @default(auto()) @map("_id") @db.ObjectId
+  animal Animal @relation(fields: [animalId], references: [id])
+  animalId String @db.ObjectId
+  created DateTime
+  text String
+  type String
 }

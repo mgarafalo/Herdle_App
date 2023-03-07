@@ -1,4 +1,5 @@
 import { Route, Routes } from "react-router-dom";
+import AnimalView from "./components/Views/Animal/AnimalView";
 import HerdView from "./components/Views/Herd/HerdView";
 import Login from "./components/Views/Login/Login";
 import MainFeed from "./components/Views/MainFeed/MainFeed";
@@ -13,9 +14,13 @@ export default function AppRouter() {
         <Route path="/" element={<MainFeed />} />
         <Route path="/login" element={<Login />} />
         <Route path="/signup" element={<SignUp />} />
+
         <Route path="/herdle/:id" element={<Profile />} />
         <Route path="/herdle/:id/herd" element={<HerdView />} />
         <Route path="/herdle/profile/:id" element={<EditProfile />} />
+
+        {/* <Route path="/animal/view/:animalId" element={<AnimalView />} /> */}
+        <Route path="/animal/view/:id" element={<AnimalView />} />
       </Routes>
     </div>
   );

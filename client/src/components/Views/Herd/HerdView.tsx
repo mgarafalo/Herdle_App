@@ -4,13 +4,6 @@ import {
   AccordionSummary,
   Button,
   Modal,
-  Paper,
-  Table,
-  TableBody,
-  TableCell,
-  TableContainer,
-  TableHead,
-  TableRow,
   Typography,
 } from "@mui/material";
 import { Box } from "@mui/system";
@@ -23,7 +16,6 @@ import { AppState } from "../../../store/store";
 import NewAnimal from "./NewAnimal";
 import NewHerd from "./NewHerd";
 import { ExpandMore } from "@mui/icons-material";
-import { Animal } from "@prisma/client";
 import { motion } from "framer-motion";
 
 export default function HerdView() {
