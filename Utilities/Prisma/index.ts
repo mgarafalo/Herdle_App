@@ -47,7 +47,7 @@ export async function findManyGeneric<T>(
           },
           ...options,
         }
-      : {}
+      : { ...options }
   );
 }
 
@@ -55,7 +55,9 @@ export async function createGeneric<T>(
   collection: ModelName,
   data: object
 ): Promise<T> {
-  return await (getPrismaModel(collection) as any).create({ ...data });
+  return await (getPrismaModel(collection) as any).create({
+    data: { ...data },
+  });
 }
 
 export async function updateSingleGeneric<T>(

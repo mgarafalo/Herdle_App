@@ -1,20 +1,25 @@
 import { Avatar, Typography, TextField, Button, Box } from "@mui/material";
 import { motion } from "framer-motion";
 import { useState, SyntheticEvent } from "react";
+import usePostMutation from "../../../api/Mutations/usePostMutation";
 import agent from "../../../service/Agent";
 
 type CommentCreatorProps = {
   postId: string;
   userId: string;
-  updateData: any;
 };
 
 export default function CommentCreator({
   postId,
   userId,
-  updateData,
 }: CommentCreatorProps) {
   const [commentBody, setCommentBody] = useState<string>();
+
+  const { mutate } = usePostMutation({
+    userId,
+    payload: postId,
+    action: async () => await agent.Posts.comment(userId, postId, commentBody!),
+  });
 
   function handleUpdateCommentBody(
     e: SyntheticEvent<HTMLTextAreaElement | HTMLInputElement>
@@ -24,12 +29,8 @@ export default function CommentCreator({
 
   async function handleSubmitComment() {
     if (!!commentBody) {
-      await agent.Posts.comment(userId, postId, commentBody!).then(
-        (response) => {
-          setCommentBody("");
-          updateData(response);
-        }
-      );
+      mutate();
+      setCommentBody("");
     } else {
       alert("Please enter a comment");
     }

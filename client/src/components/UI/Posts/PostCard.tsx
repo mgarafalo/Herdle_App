@@ -3,7 +3,6 @@ import { Box } from "@mui/system";
 import { DateTime } from "luxon";
 import ThumbUpOutlinedIcon from "@mui/icons-material/ThumbUpOutlined";
 import AddCommentOutlinedIcon from "@mui/icons-material/AddCommentOutlined";
-import { PostActions } from "../../Views/Profile/Profile";
 import { motion, MotionConfig } from "framer-motion";
 import { useState } from "react";
 import { Post } from "../../../Interfaces/Posts";
@@ -19,11 +18,11 @@ interface Props {
 
 export default function PostCard({ userId, post, updateData }: Props) {
   const [showCommentBox, setShowCommentBox] = useState<Boolean>(false);
-  const { mutate } = usePostMutation({ userId, payload: post.id });
-
-  const actions: PostActions = {
-    likePost: () => mutate(),
-  };
+  const { mutate } = usePostMutation({
+    userId,
+    payload: post.id,
+    action: async () => await agent.Posts.likePost(userId, post.id),
+  });
 
   return (
     <>
@@ -39,7 +38,7 @@ export default function PostCard({ userId, post, updateData }: Props) {
           <Typography>{post.body}</Typography>
           <Box className="flex flex-row justify-between p-2 gap-2">
             <Box className="flex flex-row">
-              <Button onClick={() => actions.likePost(post.id)}>
+              <Button onClick={() => mutate()}>
                 <Badge
                   badgeContent={post.likedByIDs.length}
                   sx={{ color: "#588157" }}
@@ -97,11 +96,7 @@ export default function PostCard({ userId, post, updateData }: Props) {
                     </Box>
                   ))}
                 <Box className="p-5 flex flex-col justify-start w-full gap-3">
-                  <CommentCreator
-                    postId={post.id}
-                    userId={userId}
-                    updateData={updateData}
-                  />
+                  <CommentCreator postId={post.id} userId={userId} />
                 </Box>
               </Box>
             </motion.div>

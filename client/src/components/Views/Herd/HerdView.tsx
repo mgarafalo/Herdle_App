@@ -7,23 +7,22 @@ import {
   Typography,
 } from "@mui/material";
 import { Box } from "@mui/system";
-import { useEffect, useState } from "react";
-import { useSelector } from "react-redux";
-import { useNavigate } from "react-router-dom";
-import { Herd } from "../../../Interfaces/Animal";
-import agent from "../../../service/Agent";
-import { AppState } from "../../../store/store";
+import { useState } from "react";
+import { useNavigate, useParams } from "react-router-dom";
 import NewAnimal from "./NewAnimal";
 import NewHerd from "./NewHerd";
 import { ExpandMore } from "@mui/icons-material";
 import { motion } from "framer-motion";
+import { useGetUserInfoQuery } from "../../../api/Queries/useGetUserInfo/useGetUserInfo";
+import { Herd } from "../../../Interfaces/Animal";
 
 export default function HerdView() {
-  const store = useSelector((state: AppState) => state.appState);
   const navigate = useNavigate();
+  const { id } = useParams();
+  const { data, isLoading, error, invalidateQuery } = useGetUserInfoQuery({
+    userId: id!,
+  });
 
-  const [herds, setHerds] = useState<Herd[]>([]);
-  const [loading, setLoading] = useState<boolean>(true);
   const [showHerdModal, setShowHerdModal] = useState<boolean>(false);
   const [showAnimalModal, setShowAnimalModal] = useState<boolean>(false);
 
@@ -48,33 +47,13 @@ export default function HerdView() {
     </>
   );
 
-  async function getUserHerds() {
-    await agent.Herd.getUserHerds(
-      window.location.href.split("/")[
-        window.location.href.split("/").length - 2
-      ]
-    )
-      .then((userHerds) => {
-        console.log(userHerds);
-        setHerds(userHerds);
-      })
-      .finally(() => {
-        setLoading(false);
-      });
-  }
-
   async function handleClose() {
     setShowAnimalModal(false);
     setShowHerdModal(false);
-    setLoading(true);
-    await getUserHerds();
+    invalidateQuery();
   }
 
-  useEffect(() => {
-    getUserHerds();
-  }, []);
-
-  if (loading) return <div>loading</div>;
+  if (isLoading) return <div>loading</div>;
 
   return (
     <>
@@ -104,15 +83,7 @@ export default function HerdView() {
               </Button>
             </Box>
             <Button
-              onClick={() =>
-                navigate(
-                  `/herdle/${
-                    window.location.href.split("/")[
-                      window.location.href.split("/").length - 2
-                    ]
-                  }`
-                )
-              }
+              onClick={() => navigate(`/herdle/${id}`)}
               sx={{ color: "#588157" }}
             >
               Animals
@@ -132,8 +103,8 @@ export default function HerdView() {
             </Box>
           </Modal>
           <Box className="flex flex-col">
-            {herds.map((herd, i) => (
-              <HerdAccordian key={i} name={herd.name} animals={herd.animals} />
+            {data?.herds!.map((herd: Herd, i) => (
+              <HerdAccordian key={i} {...herd} />
             ))}
           </Box>
         </Box>

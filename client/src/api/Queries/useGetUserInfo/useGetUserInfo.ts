@@ -1,4 +1,4 @@
-import { useQuery } from "@tanstack/react-query";
+import { QueryClient, useQuery } from "@tanstack/react-query";
 import agent from "../../../service/Agent";
 
 export type UseGetUserInfoQuery = {
@@ -6,10 +6,16 @@ export type UseGetUserInfoQuery = {
 };
 
 export function useGetUserInfoQuery({ userId }: UseGetUserInfoQuery) {
+  const queryClient = new QueryClient();
   const { data, isLoading, error } = useQuery({
     queryKey: ["userQuery"],
     queryFn: async () => await agent.Account.getUserInfo(userId),
   });
 
-  return { data, isLoading, error };
+  return {
+    data,
+    isLoading,
+    error,
+    invalidateQuery: () => queryClient.invalidateQueries(["userQuery"]),
+  };
 }

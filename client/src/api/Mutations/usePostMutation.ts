@@ -4,17 +4,18 @@ import agent from "../../service/Agent";
 export type UsePostMutation = {
   userId: string;
   payload: string;
+  action: any;
 };
 
-export default function usePostMutation({ userId, payload }: UsePostMutation) {
+export default function usePostMutation({
+  userId,
+  payload,
+  action,
+}: UsePostMutation) {
   const queryClient = useQueryClient();
-  const mutate = useMutation(
-    ["postMutation"],
-    async () => await agent.Posts.likePost(userId, payload),
-    {
-      onSettled: () => queryClient.invalidateQueries(["userQuery"]),
-    }
-  );
+  const mutate = useMutation(["postMutation"], async () => await action(), {
+    onSettled: () => queryClient.invalidateQueries(["userQuery"]),
+  });
 
   return mutate;
 }

@@ -1,4 +1,4 @@
-import { Animal, Post } from "@prisma/client";
+import { Animal, Herd, Post } from "@prisma/client";
 
 export interface User {
   id?: string;
@@ -11,4 +11,5 @@ export interface User {
   followedByIDs?: string[];
   followingIDs?: string[];
   posts?: Post[];
+  herds?: Herd[];
 }

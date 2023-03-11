@@ -1,22 +1,25 @@
-import { useEffect, useState } from "react";
+import { Box } from "@mui/material";
 import { useParams } from "react-router-dom";
-import { Animal, Herd } from "../../../Interfaces/Animal";
-import agent from "../../../service/Agent";
+import { useGetAnimalInfoQuery } from "../../../api/Queries/useGetAnimalInfoQuery/useGetAnimalInforQuery";
 
 export default function AnimalView() {
-  const [animal, setAnimal] = useState<Animal>();
   const { id } = useParams();
+  const { data, isLoading, error } = useGetAnimalInfoQuery({ animalId: id! });
 
-  async function loadData() {
-    await agent.Animal.getSingleAnimal(id!).then((animalData) => {
-      console.log(animalData);
-      setAnimal(animalData);
-    });
+  if (isLoading) {
+    return <>Loading ... </>;
   }
 
-  useEffect(() => {
-    loadData();
-  }, []);
-
-  return <></>;
+  return (
+    <>
+      <Box className="flex flex-col">
+        {Object.entries(data!).map((item) => (
+          <Box className="flex gap-2">
+            <span>{item[0]}</span>
+            <span>{item[1]}</span>
+          </Box>
+        ))}
+      </Box>
+    </>
+  );
 }

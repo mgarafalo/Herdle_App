@@ -21,6 +21,11 @@ export async function findUser(userId: string) {
       followedByIDs: true,
       followingIDs: true,
       herdle: true,
+      herds: {
+        include: {
+          animals: true,
+        },
+      },
       posts: {
         include: {
           comments: {

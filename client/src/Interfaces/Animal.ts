@@ -1,3 +1,4 @@
+import { Herd as PrismaHerd } from "@prisma/client";
 export interface Animal {
   id?: string;
   type?: string;
@@ -31,9 +32,6 @@ export interface Animal {
   photoUrl?: string;
 }
 
-export interface Herd {
-  id?: string;
-  name: string;
+export type Herd = PrismaHerd & {
   animals?: Animal[];
-  ownerId?: string;
-}
+};
