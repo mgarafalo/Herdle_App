@@ -7,6 +7,7 @@ import UserController from "./Controllers/User/UserController";
 import HerdController from "./Controllers/Herd/HerdController";
 import AnimalController from "./Controllers/Animal/AnimalController";
 import PostController from "./Controllers/Post/PostController";
+import DashboardController from "./Controllers/Dashboard/DashboardController";
 
 dotenv.config();
 
@@ -26,6 +27,7 @@ app.use("/herdle", UserController);
 app.use("/herd", HerdController);
 app.use("/animal", AnimalController);
 app.use("/post", PostController);
+app.use("/dashboard", DashboardController);
 
 /**
  * TEST Routes

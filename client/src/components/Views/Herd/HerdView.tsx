@@ -16,6 +16,27 @@ import { motion } from "framer-motion";
 import { useGetUserInfoQuery } from "../../../api/Queries/useGetUserInfo/useGetUserInfo";
 import { Herd } from "../../../Interfaces/Animal";
 
+const HerdAccordian = ({ name, animals }: Herd) => (
+  <>
+    <Accordion>
+      <AccordionSummary
+        expandIcon={<ExpandMore />}
+        aria-controls="panel1a-content"
+        id="panel1a-header"
+      >
+        <Typography>{name}</Typography>
+      </AccordionSummary>
+      <AccordionDetails>
+        {animals && animals.length ? (
+          animals.map((animal) => <Typography>{animal.name}</Typography>)
+        ) : (
+          <Typography>No animals in {name}</Typography>
+        )}
+      </AccordionDetails>
+    </Accordion>
+  </>
+);
+
 export default function HerdView() {
   const navigate = useNavigate();
   const { id } = useParams();
@@ -25,27 +46,6 @@ export default function HerdView() {
 
   const [showHerdModal, setShowHerdModal] = useState<boolean>(false);
   const [showAnimalModal, setShowAnimalModal] = useState<boolean>(false);
-
-  const HerdAccordian = ({ name, animals }: Herd) => (
-    <>
-      <Accordion>
-        <AccordionSummary
-          expandIcon={<ExpandMore />}
-          aria-controls="panel1a-content"
-          id="panel1a-header"
-        >
-          <Typography>{name}</Typography>
-        </AccordionSummary>
-        <AccordionDetails>
-          {animals && animals.length ? (
-            animals.map((animal) => <Typography>{animal.name}</Typography>)
-          ) : (
-            <Typography>No animals in {name}</Typography>
-          )}
-        </AccordionDetails>
-      </Accordion>
-    </>
-  );
 
   async function handleClose() {
     setShowAnimalModal(false);

@@ -47,6 +47,10 @@ const Account = {
     ),
 };
 
+const Dashboard = {
+  getDashboardInfo: (userId: string) => requests.get(`/dashboard/${userId}`),
+};
+
 const Herd = {
   getSingleHerd: (herdId: string) =>
     requests.get<Herd>(`/herd/single?herdId=${herdId}`),
@@ -90,6 +94,7 @@ const Posts = {
 
 const agent = {
   Account,
+  Dashboard,
   Herd,
   Animal,
   Posts,
